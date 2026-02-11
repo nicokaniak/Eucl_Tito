@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<BuildType Name="RelWithDebInfo"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="Eucl_Tito_VST3ManifestHelper.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="bd343fe1-8e99-3571-8f27-604e8d5de96d">
+		<BuildDependency Project="Eucl_Tito_VST3ManifestHelper_rc_lib.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="Eucl_Tito_VST3ManifestHelper_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4a69b09b-3ba5-37a9-b887-34ef6f37bdb3">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="Eucl_Tito_rc_lib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="29e4adb3-c538-38aa-b3ea-6d4ef63ce1d0">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="juce_vst3_helper.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4f7adb7f-e5f9-3dad-b3d5-87623cbe3391">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Folder Name="/CMakePredefinedTargets/">
+		<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0ece259d-d001-3ed3-9589-921070832c2e" DefaultStartup="true">
+			<BuildDependency Project="Eucl_Tito.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_Standalone.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_VST3.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_VST3ManifestHelper.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_VST3ManifestHelper_rc_lib.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+			<BuildDependency Project="juce_vst3_helper.vcxproj"/>
+		</Project>
+		<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2fc529be-ec55-395b-9458-74c5b09fb48f">
+			<BuildDependency Project="ALL_BUILD.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2ae6772a-4267-3311-b659-d5fb9d610196"/>
+	</Folder>
+	<Folder Name="/Eucl_Tito/">
+		<Project Path="Eucl_Tito.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="58994274-808c-383d-a4e9-316ff7f4c884">
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="Eucl_Tito_All.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="fe9a0c5b-6ca8-35d1-ba37-ecaa69645bcc">
+			<BuildDependency Project="Eucl_Tito_Standalone.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_VST3.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+			<Build Solution="Debug|*" Project="false"/>
+			<Build Solution="Release|*" Project="false"/>
+			<Build Solution="MinSizeRel|*" Project="false"/>
+			<Build Solution="RelWithDebInfo|*" Project="false"/>
+		</Project>
+		<Project Path="Eucl_Tito_Standalone.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="1e9b07a3-120a-3770-9b8e-a597b5ac109e">
+			<BuildDependency Project="Eucl_Tito.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		</Project>
+		<Project Path="Eucl_Tito_VST3.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e0498fa0-8076-3d82-9e53-a2c89b2eefca">
+			<BuildDependency Project="Eucl_Tito.vcxproj"/>
+			<BuildDependency Project="Eucl_Tito_rc_lib.vcxproj"/>
+			<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+			<BuildDependency Project="juce_vst3_helper.vcxproj"/>
+		</Project>
+	</Folder>
+</Solution>

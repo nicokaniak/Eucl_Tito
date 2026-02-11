@@ -1,0 +1,13 @@
+CMake Install
+Windows> winget install -e --id Kitware.CMake
+Ubuntu> sudo apt update && sudo apt install cmake
+
+Comandline
+Version> cmake --version
+
+Pallet (Ctrl+Shift+P)
+CMake: Select Configure Preset > default
+
+
+BUILD
+cmake --build build --config Release

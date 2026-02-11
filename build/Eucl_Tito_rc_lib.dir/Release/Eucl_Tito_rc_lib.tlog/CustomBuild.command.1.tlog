@@ -1,0 +1,20 @@
+^C:\USERS\NICOLAS KANIAK\DOCUMENTS\CODING\EUCL_TITO\BUILD\CMAKEFILES\11BC5F7909B063F5A4ADA8E962A3ED83\EUCL_TITO_RESOURCES.RC.RULE
+setlocal
+JUCE\tools\extras\Build\juceaide\juceaide_artefacts\Debug\juceaide.exe rcfile "C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/Eucl_Tito_artefacts/JuceLibraryCode/Info.txt" "C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/Eucl_Tito_artefacts/JuceLibraryCode/Eucl_Tito_resources.rc"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\NICOLAS KANIAK\DOCUMENTS\CODING\EUCL_TITO\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito" "-BC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build" --check-stamp-file "C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/CMakeFiles/generate.stamp"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

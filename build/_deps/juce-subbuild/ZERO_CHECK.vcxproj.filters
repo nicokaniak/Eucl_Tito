@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\_deps\juce-subbuild\CMakeFiles\d0bb1c0661941b635cdce6bb1c36718e\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{1C5CD63C-A73A-36F6-BE51-7463193EA328}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

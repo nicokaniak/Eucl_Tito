@@ -1,0 +1,10 @@
+^C:\USERS\NICOLAS KANIAK\DOCUMENTS\CODING\EUCL_TITO\BUILD\CMAKEFILES\4029D17873A3348EACEE1238F4D08219\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito" "-BC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/Eucl_Tito.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

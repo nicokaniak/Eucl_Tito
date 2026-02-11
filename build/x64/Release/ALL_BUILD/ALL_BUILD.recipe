@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\x64\Release\ZERO_CHECK</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\Eucl_Tito_artefacts\Release\Standalone\Eucl_Tito.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\Release\juce_vst3_helper.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\Eucl_Tito_artefacts\Release\VST3\Eucl_Tito.vst3\Contents\x86_64-win\Eucl_Tito.vst3</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\Eucl_Tito_VST3ManifestHelper_artefacts\Release\Eucl_Tito_VST3ManifestHelper.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>C:\Users\Nicolas Kaniak\Documents\CODING\Eucl_Tito\build\x64\Release\ALL_BUILD</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles />
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

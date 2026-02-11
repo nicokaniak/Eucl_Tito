@@ -1,0 +1,10 @@
+^C:\USERS\NICOLAS KANIAK\DOCUMENTS\CODING\EUCL_TITO\BUILD\JUCE\TOOLS\CMAKEFILES\5B54906F43F99D7E63011962F0720015\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-src" "-BC:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/tools" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/tools/JUCE.slnx"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

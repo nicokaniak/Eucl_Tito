@@ -1,0 +1,53 @@
+# Build artifacts
+Builds/
+JuceLibraryCode/
+*.vs/
+.vs/
+DerivedData/
+
+# Visual Studio caches and user-specific files
+*.VC.db
+*.VC.opendb
+*.suo
+*.user
+*.userprefs
+*.vcxproj.user
+ipch/
+
+# Compiled objects and libraries
+*.obj
+*.o
+*.lo
+*.la
+*.slo
+*.a
+*.lib
+*.dll
+*.so*
+*.dylib
+*.exe
+*.app
+*.pdb
+
+# Intermediate build outputs
+*.pch
+*.pdb
+*.idb
+*.ilk
+*.rsp
+*.log
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Crash and profiling dumps
+*.dmp
+*.prof
+*.stackdump
+
+# Backup files
+*~
+*.swp
+*.tmp
