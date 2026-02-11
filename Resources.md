@@ -5,6 +5,9 @@ https://github.com/dmultiply/Klide
 https://forum.juce.com/t/midi-sequencer-where-to-beggin/57938
 https://forum.juce.com/t/midi-sequencer-design-data-structures-and-synchronization/65967
 https://docs.juce.com/master/classjuce_1_1MidiMessageSequence.html
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# SEQUENCER
 (Use MidiMessageSequence for event storage/playback—it's JUCE's built-in sequencer primitive. Pair with AudioProcessor/Player for timing via getNextAudioBlock. Drive via TransportSource or HighResolutionTimer for tempo/BPM control. UI: Custom Component with TableListBox or painted grid for steps.)
 Key Components:
 SequenceModel: Owns MidiMessageSequence, step grid (e.g., Array<Array<bool>> for triggers, notes/velocities).
@@ -48,3 +51,35 @@ UI Grid (StepComponent : Component):
 Paint rectangles for steps; mouseDown toggles triggers.
 
 Link to model via std::function callbacks.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# EUCLIDEAN
+Core Algorithm
+Implement std::vector<bool> generateEuclidean(int steps, int hits):
+
+text
+vector<bool> generateEuclidean(int steps, int hits) {
+    vector<bool> pattern(steps, false);
+    int pos = 0;
+    for (int i = 0; i < hits; ++i) {
+        pattern[pos] = true;
+        pos = (pos + steps / (hits - i)) % steps;
+    }
+    return pattern;
+}
+Handles hits > steps by capping at steps.
+
+Rotation: Shift via std::rotate(pattern.begin(), pattern.begin() + offset, pattern.end()).
+
+Validates: Test E(7,3) → 1001001; E(5,8) → 11111000 (prioritizes even spacing).
+
+JUCE Integration Steps
+AudioProcessor: In processBlock, track transport position (AudioPlayHead::CurrentPositionInfo). Advance step index via totalSamples % (sampleRate * stepsPerBeat / bpm).
+
+Sequencer Class: class EuclideanSeq { int steps=16, hits=8, rotation=0, currentStep=0; void advance() { currentStep = (currentStep + 1) % steps; } bool isHit() { return pattern[currentStep]; } }; Regenerate pattern on param change.
+
+Parameters: AudioParameterInt stepsParam("steps", "Steps", 1, 64); etc. Use paramChanged callback to rebuild.
+
+MIDI Out: If isHit() and transport playing, sendNoteOn(MidiMessage::noteOn(...)).
+
+UI: Slider for steps/hits/rotation; CustomComponent paints grid (rows=1 voice, cols=steps; fill if pattern[j]). Repaint on param drag.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
