@@ -245,7 +245,7 @@ FETCHCONTENT_UPDATES_DISCONNECTED_JUCE:BOOL=OFF
 GIT_EXECUTABLE:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //Value Computed by CMake
-JUCE_BINARY_DIR:STATIC=C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE
+JUCE_BINARY_DIR:STATIC=C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build
 
 //Add build targets for the DemoRunner and PIPs
 JUCE_BUILD_EXAMPLES:BOOL=OFF

@@ -83,3 +83,10 @@ MIDI Out: If isHit() and transport playing, sendNoteOn(MidiMessage::noteOn(...))
 
 UI: Slider for steps/hits/rotation; CustomComponent paints grid (rows=1 voice, cols=steps; fill if pattern[j]). Repaint on param drag.
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ERRORS_HANDLING
+- Core Approach
+  JUCE favors juce::Result over exceptions for error propagation in most APIs, enabling lightweight, exception-free handling suitable for real-time audio. Exceptions are minimized to avoid performance hits and complexity in audio threads; forums advise against routine use. (https://forum.juce.com/t/juce-and-exception-handling/15144)
+- Key Tools
+              juce::Result: Signals success (Result::ok()) or failure with message (Result::fail("msg")). Check via if (result.ok()) or if (!result); access error with result.getErrorMessage(https://docs.juce.com/master/classjuce_1_1Result.html).
+              Assertions: jassert() for debug checks (e.g., invalid states); fails loudly in dev builds. (https://www.reddit.com/r/JUCE/comments/1bmpp61/about_assertion_failure_error/)
+              Unhandled Exceptions: Enable JUCE_CATCH_UNHANDLED_EXCEPTIONS to route to JUCEApplicationBase::uncaughtException(). (https://docs.juce.com/master/juce__core_8h.html)  (https://docs.juce.com/master/classjuce_1_1JUCEApplicationBase.html)

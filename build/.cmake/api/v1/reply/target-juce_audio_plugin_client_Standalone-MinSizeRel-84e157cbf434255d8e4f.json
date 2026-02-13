@@ -1,0 +1,70 @@
+{
+	"abstract" : true,
+	"backtrace" : 5,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"_juce_add_interface_library",
+			"_juce_add_plugin_wrapper_target",
+			"juce_add_module",
+			"juce_add_modules"
+		],
+		"files" : 
+		[
+			"build/_deps/juce-src/extras/Build/CMake/JUCEModuleSupport.cmake",
+			"build/_deps/juce-src/modules/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 33,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 664,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 466,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 330,
+				"parent" : 3
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 78,
+				"parent" : 4
+			}
+		]
+	},
+	"codemodelVersion" : 
+	{
+		"major" : 2,
+		"minor" : 9
+	},
+	"id" : "juce_audio_plugin_client_Standalone::@d258f3a116863e478940",
+	"name" : "juce_audio_plugin_client_Standalone",
+	"paths" : 
+	{
+		"build" : "_deps/juce-build/modules",
+		"source" : "build/_deps/juce-src/modules"
+	},
+	"sources" : [],
+	"type" : "INTERFACE_LIBRARY"
+}

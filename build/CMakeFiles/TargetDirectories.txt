@@ -9,8 +9,8 @@ C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/CMakeFiles/Eucl_Tito_VS
 C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/CMakeFiles/INSTALL.dir
 C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/CMakeFiles/ALL_BUILD.dir
 C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/CMakeFiles/INSTALL.dir
-C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/CMakeFiles/ALL_BUILD.dir
-C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/modules/CMakeFiles/INSTALL.dir
-C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/extras/Build/CMakeFiles/INSTALL.dir
-C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/JUCE/extras/Build/juceaide/CMakeFiles/INSTALL.dir
+C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build/CMakeFiles/INSTALL.dir
+C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build/modules/CMakeFiles/INSTALL.dir
+C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build/extras/Build/CMakeFiles/INSTALL.dir
+C:/Users/Nicolas Kaniak/Documents/CODING/Eucl_Tito/build/_deps/juce-build/extras/Build/juceaide/CMakeFiles/INSTALL.dir
