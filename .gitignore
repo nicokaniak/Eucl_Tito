@@ -1,5 +1,6 @@
 # Build artifacts
 Builds/
+build/
 JuceLibraryCode/
 *.vs/
 .vs/
