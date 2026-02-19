@@ -9,17 +9,22 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include <cmath>
+
+namespace
+{
+    constexpr double kStepLengthPPQ = 0.25;
+    constexpr double kGateLengthPPQ = 0.10;
+}
+
 //==============================================================================
 Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
+#if ! JucePlugin_IsMidiEffect && ! defined (JucePlugin_PreferredChannelConfigurations)
      : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
+                     #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 {
 }
@@ -132,41 +137,109 @@ bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    // This instrument only generates MIDI; force the audio buffer to silence.
+    buffer.clear();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    midiMessages.clear();
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    const double sampleRate = getSampleRate();
+    if (sampleRate <= 0.0)
+        return;
+
+    // Step 4: Derive timing from host playhead if available, otherwise advance our own clock.
+    juce::AudioPlayHead::CurrentPositionInfo posInfo;
+    auto* playHeadPtr = getPlayHead();
+    const bool hasPosition = (playHeadPtr != nullptr && playHeadPtr->getCurrentPosition (posInfo));
+
+    const double bpm = (hasPosition && posInfo.bpm > 0.0) ? posInfo.bpm : 120.0;
+    const double samplesPerBeat = sampleRate * 60.0 / bpm;
+    const double ppqPerSample = samplesPerBeat > 0.0 ? 1.0 / samplesPerBeat : 0.0;
+    if (ppqPerSample <= 0.0)
+        return;
+
+    double blockStartPPQ = localClockPpq;
+    if (hasPosition && posInfo.isPlaying)
     {
-        auto* channelData = buffer.getWritePointer (channel);
+        if (! hostPositionInitialised || std::abs (posInfo.ppqPosition - lastHostPpq) > 0.001)
+        {
+            blockStartPPQ = posInfo.ppqPosition;
+            localClockPpq = blockStartPPQ;
+            hostPositionInitialised = true;
+        }
 
-        // ..do something to the data...
+        lastHostPpq = posInfo.ppqPosition;
     }
+
+    const double blockEndPPQ = blockStartPPQ + (buffer.getNumSamples() * ppqPerSample);
+    localClockPpq = blockEndPPQ;
+
+    const double sequenceLengthPPQ = kNumSteps * kStepLengthPPQ;
+    if (sequenceLengthPPQ <= 0.0)
+        return;
+
+    const int firstLoop = (int) std::floor (blockStartPPQ / sequenceLengthPPQ);
+    const int lastLoop  = (int) std::floor ((blockEndPPQ - 1.0e-9) / sequenceLengthPPQ);
+
+    // Step 5: Emit MIDI events in-range for this audio block (looping pattern).
+    for (int loopIndex = firstLoop; loopIndex <= lastLoop; ++loopIndex)
+    {
+        const double loopOffset = loopIndex * sequenceLengthPPQ;
+        for (int step = 0; step < kNumSteps; ++step)
+        {
+            if (binaryPattern[(size_t) step] == 0)
+                continue;
+
+            const double noteOnPPQ  = loopOffset + (step * kStepLengthPPQ);
+            const double noteOffPPQ = noteOnPPQ + kGateLengthPPQ;
+
+            if (noteOnPPQ >= blockStartPPQ && noteOnPPQ < blockEndPPQ)
+            {
+                const int sampleOffset = (int) std::round ((noteOnPPQ - blockStartPPQ) / ppqPerSample);
+                midiMessages.addEvent (juce::MidiMessage::noteOn (1, 60, (juce::uint8) 100),
+                                       juce::jlimit (0, buffer.getNumSamples() - 1, sampleOffset));
+            }
+
+            if (noteOffPPQ >= blockStartPPQ && noteOffPPQ < blockEndPPQ)
+            {
+                const int sampleOffset = (int) std::round ((noteOffPPQ - blockStartPPQ) / ppqPerSample);
+                midiMessages.addEvent (juce::MidiMessage::noteOff (1, 60),
+                                       juce::jlimit (0, buffer.getNumSamples() - 1, sampleOffset));
+            }
+        }
+    }
+
+   #if JUCE_DEBUG
+    {
+        const int eventsGenerated = midiMessages.getNumEvents();
+        DBG ("Eucl_Tito: MIDI events this block = " << eventsGenerated);
+
+        juce::MidiBuffer::Iterator iterator (midiMessages);
+        juce::MidiMessage message;
+        int samplePosition = 0;
+
+        while (iterator.getNextEvent (message, samplePosition))
+        {
+            const auto typeDescription = message.isNoteOn()  ? "noteOn"
+                                         : message.isNoteOff() ? "noteOff"
+                                                               : "other";
+            DBG ("  -> " << typeDescription
+                 << " note=" << message.getNoteNumber()
+                 << " vel=" << (int) message.getVelocity()
+                 << " sampleOffset=" << samplePosition);
+        }
+    }
+   #endif
 }
 
 //==============================================================================
 bool Eucl_TitoAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return false;
 }
 
 juce::AudioProcessorEditor* Eucl_TitoAudioProcessor::createEditor()
 {
-    return new Eucl_TitoAudioProcessorEditor (*this);
+    return nullptr;
 }
 
 //==============================================================================

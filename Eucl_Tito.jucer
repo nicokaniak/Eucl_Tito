@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="JF65ZF" name="Eucl_Tito" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Generator" cppLanguageStandard="latest">
+              pluginVST3Category="MidiEffect" cppLanguageStandard="latest">
   <MAINGROUP id="UpHPjG" name="Eucl_Tito">
     <GROUP id="{371914A6-8BC0-8037-48B6-FC81602A60BF}" name="Source">
       <FILE id="NRMqdW" name="PluginProcessor.cpp" compile="1" resource="0"

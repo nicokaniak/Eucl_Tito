@@ -39,13 +39,129 @@
 - **UI techniques:** Represent the grid with a custom `Component` that caches rectangles per step. Use lambdas or `std::function` callbacks supplied by the processor/editor bridge to toggle steps, regenerate patterns, and request repaint. Reference Klide’s `TrackComponent` for multi-lane layouts.[2][8]
 
 ## Step-by-Step: Sequencer for a Binary Pattern
-1. **Declare the pattern source.** Store the provided array of 1s/0s as a `std::array<int, numSteps>` (or `std::bitset`) in the processor so it is visible to both UI and audio threads. Interpret `1` as "gate on" and `0` as "rest". Expose helper methods like `bool isStepActive(int index) const noexcept` for the editor.
-2. **Precompute note events.** In a background/task thread (triggered when the binary array changes), iterate the pattern and build a `juce::MidiMessageSequence` whose timestamps reflect step positions. For each index `i`, if `pattern[i] == 1`, add paired `noteOn`/`noteOff` messages with times `i * stepLengthPPQ` and `i * stepLengthPPQ + gatePPQ`. Store the finished sequence in the inactive slot of a double buffer.
-3. **Swap sequences safely.** Push a command into a lock-free FIFO telling the audio thread that a new sequence is ready. At the start of `processBlock`, drain the FIFO and atomically swap which `MidiMessageSequence*` is active. This keeps the real-time thread allocation-free.
-4. **Derive timing per block.** Call `AudioPlayHead::getCurrentPosition()` once per `processBlock` to capture `bpm`, `ppqPosition`, and `isPlaying`. Compute `samplesPerBeat = sampleRate * 60.0 / bpm` (fall back to a `HighResolutionTimer` accumulator if the host data is unavailable) and convert to `ppqPerSample` so you can map sample offsets to PPQ time.
-5. **Emit MIDI from the active sequence.** Using `MidiMessageSequence::getNextIndexAtTime`, collect all events whose timestamps fall between `blockStartPPQ` and `blockEndPPQ`, and add them to the outgoing `MidiBuffer` with `midiMessages.addEvent(message, sampleOffset)`. Because the pattern only contains on/off gates, you only inject messages for indices with a `1`.
-6. **Keep UI feedback in sync.** The editor polls the processor (or subscribes via `AudioProcessorValueTreeState`) to discover the current step index, which you can publish as `currentStep = (int) std::fmod(ppqPosition / stepLengthPPQ, numSteps)`. Repaint the grid so steps whose value is `1` show as lit, and highlight the running index so users see exactly which array entry is firing.
-7. **Expose controls to load or edit arrays.** Provide buttons or text inputs that let the user paste/modify the binary string. When it changes, regenerate the `MidiMessageSequence` (step 2) and push another FIFO command so the audio thread starts using the new pattern seamlessly.
+1. **Declare the pattern source.** Store the binary array plus double-buffered sequences inside the processor so both threads can read immutable snapshots. Add the following in `Source/PluginProcessor.h` after the private section comment (around line 56):
+
+   ```cpp
+   // File: Source/PluginProcessor.h (line ~56)
+   static constexpr int kNumSteps = 16;
+   std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 1, 0, 1, 0, 1, 0,
+                                                  1, 0, 1, 0, 1, 0, 1, 0 };
+   std::array<juce::MidiMessageSequence, 2> patternSequences;
+   std::atomic<int> activeSequence { 0 };
+   juce::AbstractFifo swapFifo { 8 };
+   ```
+
+2. **Precompute note events.** Create a helper that rebuilds the inactive `MidiMessageSequence` whenever the pattern changes. Place this in `Source/PluginProcessor.cpp` near the other private helpers (around line 110):
+
+   ```cpp
+   // File: Source/PluginProcessor.cpp (line ~110)
+   void Eucl_TitoAudioProcessor::rebuildPatternSequence()
+   {
+       const double stepLengthPPQ = 0.25; // quarter-note subdivision
+       const double gateLengthPPQ = 0.10;
+
+       const int inactive = 1 - activeSequence.load();
+       auto& sequence = patternSequences[(size_t) inactive];
+       sequence.clear();
+
+       for (int i = 0; i < kNumSteps; ++i)
+       {
+           if (binaryPattern[(size_t) i] == 0)
+               continue;
+
+           const double start = i * stepLengthPPQ;
+           sequence.addEvent (juce::MidiMessage::noteOn  (1, 60, (juce::uint8) 100), start);
+           sequence.addEvent (juce::MidiMessage::noteOff (1, 60), start + gateLengthPPQ);
+       }
+
+       swapFifo.write (1);
+   }
+   ```
+
+3. **Swap sequences safely.** Drain the FIFO inside `processBlock` before rendering so the audio thread only flips pointers, never mutates data. Insert this helper call near the start of `processBlock` (around line 136 in `Source/PluginProcessor.cpp`):
+
+   ```cpp
+   // File: Source/PluginProcessor.cpp (line ~136)
+   auto drainSwapFifo = [this]() noexcept
+   {
+       while (swapFifo.getNumReady() > 0)
+       {
+           swapFifo.read (1);
+           activeSequence.store (1 - activeSequence.load());
+       }
+   };
+
+   drainSwapFifo();
+   ```
+
+4. **Derive timing per block.** Query the playhead once per call and compute PPQ-to-sample ratios. Add the snippet below near the top of `processBlock` after draining the FIFO (around line 150):
+
+   ```cpp
+   // File: Source/PluginProcessor.cpp (line ~150)
+   juce::AudioPlayHead::CurrentPositionInfo posInfo;
+   const bool hasPosition = getPlayHead() != nullptr && getPlayHead()->getCurrentPosition (posInfo);
+
+   const double bpm = hasPosition && posInfo.bpm > 0.0 ? posInfo.bpm : 120.0;
+   const double samplesPerBeat = getSampleRate() * 60.0 / bpm;
+   const double ppqPerSample = 1.0 / samplesPerBeat;
+   const double blockStartPPQ = hasPosition ? posInfo.ppqPosition : localClockPpq;
+   const double blockEndPPQ   = blockStartPPQ + (buffer.getNumSamples() * ppqPerSample);
+   ```
+
+5. **Emit MIDI from the active sequence.** Walk the active sequence and copy events that fall inside the current block into the outgoing `MidiBuffer`. Append this loop after the timing math (line ~165 in `Source/PluginProcessor.cpp`):
+
+   ```cpp
+   // File: Source/PluginProcessor.cpp (line ~165)
+   auto& sequence = patternSequences[(size_t) activeSequence.load()];
+   const int startIndex = sequence.getNextIndexAtTime (blockStartPPQ);
+
+   for (int i = startIndex; i < sequence.getNumEvents(); ++i)
+   {
+       const auto* holder = sequence.getEventPointer (i);
+       const double eventTime = holder->message.getTimeStamp();
+       if (eventTime >= blockEndPPQ)
+           break;
+
+       const int sampleOffset = int ((eventTime - blockStartPPQ) / ppqPerSample);
+       midiMessages.addEvent (holder->message, juce::jlimit (0, buffer.getNumSamples() - 1, sampleOffset));
+   }
+   ```
+
+6. **Keep UI feedback in sync.** Publish the currently playing step via an atomic so the editor can repaint. Update a member before exiting `processBlock` (around line 185) and read it in `PluginEditor.cpp` when painting the grid:
+
+   ```cpp
+   // File: Source/PluginProcessor.cpp (line ~185)
+   currentStep.store ((int) std::floor (std::fmod (blockStartPPQ / 0.25, kNumSteps)));
+   ```
+
+   ```cpp
+   // File: Source/PluginEditor.cpp (line ~60)
+   const auto playingStep = audioProcessor.getCurrentStep();
+   for (int i = 0; i < Eucl_TitoAudioProcessor::kNumSteps; ++i)
+   {
+       const bool isActive = audioProcessor.isStepActive (i);
+       const bool isPlaying = (i == playingStep);
+       g.setColour (isPlaying ? juce::Colours::orange : (isActive ? juce::Colours::white : juce::Colours::dimgrey));
+       g.fillRect (stepArea);
+       stepArea.translate (stepWidth + padding, 0);
+   }
+   ```
+
+7. **Expose controls to load or edit arrays.** Provide a text box or toggle buttons that modify `binaryPattern`, then call `rebuildPatternSequence()`. Add the following handler in `PluginEditor.cpp` near your UI callbacks (around line 90):
+
+   ```cpp
+   // File: Source/PluginEditor.cpp (line ~90)
+   void Eucl_TitoAudioProcessorEditor::onPatternTextChanged (const juce::String& bits)
+   {
+       std::array<uint8_t, Eucl_TitoAudioProcessor::kNumSteps> newPattern {};
+       for (int i = 0; i < newPattern.size(); ++i)
+           newPattern[(size_t) i] = (uint8_t) (bits[i] == '1');
+
+       audioProcessor.setBinaryPattern (newPattern);
+   }
+   ```
+
+   Inside `setBinaryPattern` (add in `PluginProcessor.cpp` around line 210) copy the array, call `rebuildPatternSequence()`, and let the FIFO trigger the swap.
 
 ## Risks & Pitfalls
 - **Allocations in `processBlock`:** Avoid calling `addEvent` or modifying STL containers on the audio thread. Pre-build sequences and reuse `MidiBuffer` objects per block.[3][7]

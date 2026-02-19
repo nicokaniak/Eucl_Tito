@@ -53,7 +53,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    // Step 1: Hard-coded pattern definition only.
+    static constexpr int kNumSteps = 16;
+
 private:
+    std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 1, 0, 1, 0, 1, 0,
+                                                   1, 0, 1, 0, 1, 0, 1, 0 };
+    double localClockPpq { 0.0 };                   // Step 4 fallback clock
+    double lastHostPpq { 0.0 };
+    bool hostPositionInitialised { false };
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Eucl_TitoAudioProcessor)
 };
