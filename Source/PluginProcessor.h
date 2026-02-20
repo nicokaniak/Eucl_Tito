@@ -12,22 +12,22 @@
 
 //==============================================================================
 /**
-    Juce::AudioProcessor subclass that owns the Euclidean sequencer logic.
-    It sits in between the host (DAW) and the UI editor:
-      * The host drives lifecycle calls such as prepareToPlay/processBlock.
-      * processBlock emits MIDI events that the user interface (PluginEditor)
-        can visualise or control once parameters are added.
+    Subclase de juce::AudioProcessor que contiene la lógica del secuenciador euclidiano.
+    Se ubica entre el host (DAW) y el editor de UI:
+      * El host ejecuta llamadas de ciclo de vida como prepareToPlay/processBlock.
+      * processBlock emite eventos MIDI que la interfaz (PluginEditor) podrá
+        visualizar o controlar una vez que se añadan parámetros.
 */
 class Eucl_TitoAudioProcessor  : public juce::AudioProcessor
 {
 public:
     //==============================================================================
-    // Construction/Destruction – JUCE instantiates this via createPluginFilter().
+    // Construcción/Destrucción – JUCE instancia esta clase mediante createPluginFilter().
     Eucl_TitoAudioProcessor();
     ~Eucl_TitoAudioProcessor() override;
 
     //==============================================================================
-    // Host lifecycle hooks – prepare, release, validate busing layouts.
+    // Hooks del ciclo de vida del host – preparar, liberar y validar configuraciones de buses.
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -35,16 +35,16 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
-    // Core audio/MIDI loop – the DAW calls this for each processing block.
+    // Loop principal de audio/MIDI – el DAW invoca esto para cada bloque de procesamiento.
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
 
     //==============================================================================
-    // UI attachment – advertises whether a GUI exists and creates it on demand.
+    // Enlace con la UI – informa si existe GUI y la crea bajo demanda.
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
     //==============================================================================
-    // Host capability queries – let the DAW know about MIDI/tail/program info.
+    // Consultas de capacidades – informa al DAW sobre MIDI/tail/program info.
     const juce::String getName() const override;
 
     bool acceptsMidi() const override;
@@ -63,16 +63,16 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    // Step 1: Hard-coded pattern definition only.
+    // Paso 1: definición del patrón solamente, codificada de forma fija.
     static constexpr int kNumSteps = 16;
 
 private:
-    // Binary Euclidean sequence that drives the note generator in processBlock().
+    // Secuencia binaria euclidiana que alimenta al generador de notas en processBlock().
     std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 1, 0, 1, 0, 1, 0,
                                                    1, 0, 1, 0, 1, 0, 1, 0 };
-    // Local transport bookkeeping so the sequencer can keep ticking if the host
-    // provides no timeline data (or to smooth out sudden jumps).
-    double localClockPpq { 0.0 };                   // Step 4 fallback clock
+    // Control del transporte local para que el secuenciador siga corriendo si el host
+    // no entrega datos de timeline (o para suavizar saltos bruscos).
+    double localClockPpq { 0.0 };                   // Paso 4: reloj de respaldo
     double lastHostPpq { 0.0 };
     bool hostPositionInitialised { false };
     //==============================================================================

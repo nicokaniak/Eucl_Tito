@@ -1,9 +1,9 @@
 /*
-  ==============================================================================
+  ============================================================================== 
 
     This file contains the basic framework code for a JUCE plugin processor.
 
-  ==============================================================================
+  ============================================================================== 
 */
 
 #include "PluginProcessor.h"
@@ -13,11 +13,11 @@
 
 namespace
 {
-    // Sequencer grid configuration expressed in pulses-per-quarter (PPQ).
-    // The processor and editor can later expose these as parameters; for now they
-    // act like the "Step" and "Gate" objects in a Max patch.
-    constexpr double kStepLengthPPQ = 0.25; // quarter note subdivided into 16th notes
-    constexpr double kGateLengthPPQ = 0.10; // smaller value shortens note length
+    // Configuración del grid del secuenciador expresada en pulsos por negra (PPQ).
+    // El procesador y el editor podrán exponer estos valores como parámetros más adelante;
+    // por ahora se comportan como los objetos "Step" y "Gate" en un patch de Max.
+    constexpr double kStepLengthPPQ = 0.25; // negra subdividida en corcheas
+    constexpr double kGateLengthPPQ = 0.10; // valores menores acortan la nota
 }
 
 //==============================================================================
@@ -30,14 +30,14 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 {
-    // Constructor is intentionally light-weight; heavy lifting belongs to
-    // prepareToPlay() once the host provides sample rate and buffer size.
+    // El constructor se mantiene liviano a propósito; el trabajo pesado ocurre en
+    // prepareToPlay() una vez que el host entrega sample rate y tamaño de buffer.
 }
 
 Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
 {
-    // Nothing to tear down yet; placeholder for future allocations (i.e. buffers,
-    // parameter attachments) that will mirror prepareToPlay()/releaseResources().
+    // Aún no hay nada que liberar; marcador para futuras asignaciones (buffers,
+    // attachments de parámetros) que seguirán el ciclo prepareToPlay()/releaseResources().
 }
 
 //==============================================================================
@@ -80,8 +80,8 @@ double Eucl_TitoAudioProcessor::getTailLengthSeconds() const
 
 int Eucl_TitoAudioProcessor::getNumPrograms()
 {
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    return 1;   // Nota: algunos hosts no manejan bien que existan 0 programas,
+                // por lo que conviene informar al menos 1 aunque no se usen presets.
 }
 
 int Eucl_TitoAudioProcessor::getCurrentProgram()
@@ -106,15 +106,15 @@ void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& 
 void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused (sampleRate, samplesPerBlock);
-    // Hook called right before audio starts. In Max terms this is where you would
-    // prime your metro/clock objects; here we will later reset phase accumulators
-    // or allocate buffers that depend on the host's timing info.
+    // Hook que se ejecuta justo antes de que comience el audio. En términos de Max,
+    // este sería el lugar para preparar objetos metro/clock; aquí reiniciaremos
+    // acumuladores de fase o asignaremos buffers según la información temporal del host.
 }
 
 void Eucl_TitoAudioProcessor::releaseResources()
 {
-    // Symmetric counterpart to prepareToPlay(); free buffers or detach resources
-    // so the processor stays lightweight when the host is idle.
+    // Contraparte simétrica de prepareToPlay(); libera buffers o recursos sueltos
+    // para mantener liviano al procesador cuando el host está inactivo.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -124,15 +124,15 @@ bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
     juce::ignoreUnused (layouts);
     return true;
   #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
+    // Acá es donde se valida si el diseño de buses es compatible.
+    // En esta plantilla solo se aceptan mono o estéreo.
+    // Algunos hosts (p. ej. ciertas versiones de GarageBand) únicamente cargan
+    // plugins que soporten buses estéreo.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
-    // This checks if the input layout matches the output layout
+    // Verifica que la configuración de entrada coincida con la de salida
    #if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
@@ -146,9 +146,9 @@ bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    // This plug-in only emits MIDI gates, so we keep the audio buffer silent to
-    // avoid feeding DC/garbage to the host's mixer (akin to leaving an MSP~ cord
-    // disconnected while still using Max's event network).
+    // Este plugin solo emite MIDI gates, así que mantenemos el buffer de audio en silencio
+    // para evitar enviar DC o basura al mezclador del host (similar a dejar un cable MSP~ suelto
+    // mientras se sigue usando la red de eventos en Max).
     buffer.clear();
 
     midiMessages.clear();
@@ -157,10 +157,10 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     if (sampleRate <= 0.0)
         return;
 
-    // Step 4: Derive timing from host playhead if available, otherwise advance our own clock.
-    // This is the processor's transport brain: it listens to the DAW playhead
-    // (similar to driving a patch with Ableton Link) and, if unavailable, falls
-    // back to an internal counter so the sequencer still runs.
+    // Paso 4: derivar la sincronía desde el playhead del host si está disponible; de lo contrario,
+    // avanzar con nuestro reloj interno. Este es el "cerebro" de transporte: escucha el playhead
+    // del DAW (similar a conducir un patch con Ableton Link) y, si no hay datos, recurre a un contador
+    // interno para que el secuenciador continúe.
     juce::AudioPlayHead::CurrentPositionInfo posInfo;
     auto* playHeadPtr = getPlayHead();
     const bool hasPosition = (playHeadPtr != nullptr && playHeadPtr->getCurrentPosition (posInfo));
@@ -194,10 +194,10 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     const int firstLoop = (int) std::floor (blockStartPPQ / sequenceLengthPPQ);
     const int lastLoop  = (int) std::floor ((blockEndPPQ - 1.0e-9) / sequenceLengthPPQ);
 
-    // Step 5: Emit MIDI events in-range for this audio block (looping pattern).
-    // Conceptually, each iteration is like a Max [uzi] sending note triggers to a
-    // [makenote] object: we walk the pattern, create note-on/off pairs, and stamp
-    // them into the MidiBuffer so the host hears the groove at the right sample.
+    // Paso 5: emitir eventos MIDI cuyo rango caiga dentro del bloque actual (patrón en loop).
+    // Conceptualmente, cada iteración es como un [uzi] de Max disparando notas hacia un
+    // [makenote]: recorremos el patrón, creamos pares note-on/off y los escribimos en el
+    // MidiBuffer para que el host escuche el groove en la muestra correcta.
     for (int loopIndex = firstLoop; loopIndex <= lastLoop; ++loopIndex)
     {
         const double loopOffset = loopIndex * sequenceLengthPPQ;
@@ -230,8 +230,8 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         const int eventsGenerated = midiMessages.getNumEvents();
         DBG ("Eucl_Tito: MIDI events this block = " << eventsGenerated);
 
-        // Optional debug dump behaves like piping the MIDI list into Max's print
-        // object so you can inspect the note stream in the console.
+        // El output opcional del debug funciona como enviar la lista MIDI a un print de Max
+        // para inspeccionar el flujo de notas desde la consola.
         juce::MidiBuffer::Iterator iterator (midiMessages);
         juce::MidiMessage message;
         int samplePosition = 0;
@@ -253,15 +253,15 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 //==============================================================================
 bool Eucl_TitoAudioProcessor::hasEditor() const
 {
-    // The processor is currently headless; returning false ensures the host does
-    // not request an editor until we provide a proper UI implementation.
+    // El procesador sigue sin interfaz; devolver false evita que el host pida un editor
+    // hasta que implementemos una UI real.
     return false;
 }
 
 juce::AudioProcessorEditor* Eucl_TitoAudioProcessor::createEditor()
 {
-    // Placeholder – once ready, instantiate Eucl_TitoAudioProcessorEditor so the
-    // user can tweak the sequencer visually.
+    // Marcador temporal: cuando esté listo instanciará Eucl_TitoAudioProcessorEditor
+    // para que el usuario pueda manipular el secuenciador desde la UI.
     return nullptr;
 }
 
@@ -269,19 +269,19 @@ juce::AudioProcessorEditor* Eucl_TitoAudioProcessor::createEditor()
 void Eucl_TitoAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     juce::ignoreUnused (destData);
-    // Future home for preset serialization (akin to saving a Max patch): stash
-    // parameter/value tree state so the DAW restores the pattern on session load.
+    // Futuro hogar para la serialización de presets (como guardar un patch de Max):
+    // almacenará el árbol de parámetros/valores para que el DAW restaure el patrón al abrir la sesión.
 }
 
 void Eucl_TitoAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     juce::ignoreUnused (data, sizeInBytes);
-    // Mirror of getStateInformation(); apply the saved state back to parameters
-    // so the sequencer picks up exactly where the user left off.
+    // Espejo de getStateInformation(); aplica el estado guardado a los parámetros
+    // para que el secuenciador continúe exactamente donde lo dejó el usuario.
 }
 
 //==============================================================================
-// This creates new instances of the plugin..
+// Crea nuevas instancias del plugin.
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new Eucl_TitoAudioProcessor();
