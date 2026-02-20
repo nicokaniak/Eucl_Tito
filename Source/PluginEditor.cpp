@@ -13,8 +13,8 @@
 Eucl_TitoAudioProcessorEditor::Eucl_TitoAudioProcessorEditor (Eucl_TitoAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    // Max analogy: this component is the presentation frame; setSize() defines
+    // the canvas where knobs, toggles, and sequencer lights will live.
     setSize (400, 300);
 }
 
@@ -25,7 +25,8 @@ Eucl_TitoAudioProcessorEditor::~Eucl_TitoAudioProcessorEditor()
 //==============================================================================
 void Eucl_TitoAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
+    // paint() is equivalent to Max's front-end drawing: repaint the background
+    // and text for every frame Juce requests (e.g., after a resize or parameter change).
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
     g.setColour (juce::Colours::white);
@@ -35,6 +36,6 @@ void Eucl_TitoAudioProcessorEditor::paint (juce::Graphics& g)
 
 void Eucl_TitoAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    // Layout callback – wire subcomponents here once the UI grows. Treat it like
+    // arranging UI boxes in Max so all parameter widgets talk to audioProcessor.
 }

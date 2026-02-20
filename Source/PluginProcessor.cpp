@@ -13,8 +13,11 @@
 
 namespace
 {
-    constexpr double kStepLengthPPQ = 0.25;
-    constexpr double kGateLengthPPQ = 0.10;
+    // Sequencer grid configuration expressed in pulses-per-quarter (PPQ).
+    // The processor and editor can later expose these as parameters; for now they
+    // act like the "Step" and "Gate" objects in a Max patch.
+    constexpr double kStepLengthPPQ = 0.25; // quarter note subdivided into 16th notes
+    constexpr double kGateLengthPPQ = 0.10; // smaller value shortens note length
 }
 
 //==============================================================================
@@ -27,10 +30,14 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 {
+    // Constructor is intentionally light-weight; heavy lifting belongs to
+    // prepareToPlay() once the host provides sample rate and buffer size.
 }
 
 Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
 {
+    // Nothing to tear down yet; placeholder for future allocations (i.e. buffers,
+    // parameter attachments) that will mirror prepareToPlay()/releaseResources().
 }
 
 //==============================================================================
@@ -98,14 +105,16 @@ void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    // Hook called right before audio starts. In Max terms this is where you would
+    // prime your metro/clock objects; here we will later reset phase accumulators
+    // or allocate buffers that depend on the host's timing info.
 }
 
 void Eucl_TitoAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    // Symmetric counterpart to prepareToPlay(); free buffers or detach resources
+    // so the processor stays lightweight when the host is idle.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -137,7 +146,9 @@ bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    // This instrument only generates MIDI; force the audio buffer to silence.
+    // This plug-in only emits MIDI gates, so we keep the audio buffer silent to
+    // avoid feeding DC/garbage to the host's mixer (akin to leaving an MSP~ cord
+    // disconnected while still using Max's event network).
     buffer.clear();
 
     midiMessages.clear();
@@ -147,6 +158,9 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         return;
 
     // Step 4: Derive timing from host playhead if available, otherwise advance our own clock.
+    // This is the processor's transport brain: it listens to the DAW playhead
+    // (similar to driving a patch with Ableton Link) and, if unavailable, falls
+    // back to an internal counter so the sequencer still runs.
     juce::AudioPlayHead::CurrentPositionInfo posInfo;
     auto* playHeadPtr = getPlayHead();
     const bool hasPosition = (playHeadPtr != nullptr && playHeadPtr->getCurrentPosition (posInfo));
@@ -181,6 +195,9 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     const int lastLoop  = (int) std::floor ((blockEndPPQ - 1.0e-9) / sequenceLengthPPQ);
 
     // Step 5: Emit MIDI events in-range for this audio block (looping pattern).
+    // Conceptually, each iteration is like a Max [uzi] sending note triggers to a
+    // [makenote] object: we walk the pattern, create note-on/off pairs, and stamp
+    // them into the MidiBuffer so the host hears the groove at the right sample.
     for (int loopIndex = firstLoop; loopIndex <= lastLoop; ++loopIndex)
     {
         const double loopOffset = loopIndex * sequenceLengthPPQ;
@@ -213,6 +230,8 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         const int eventsGenerated = midiMessages.getNumEvents();
         DBG ("Eucl_Tito: MIDI events this block = " << eventsGenerated);
 
+        // Optional debug dump behaves like piping the MIDI list into Max's print
+        // object so you can inspect the note stream in the console.
         juce::MidiBuffer::Iterator iterator (midiMessages);
         juce::MidiMessage message;
         int samplePosition = 0;
@@ -234,26 +253,31 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 //==============================================================================
 bool Eucl_TitoAudioProcessor::hasEditor() const
 {
+    // The processor is currently headless; returning false ensures the host does
+    // not request an editor until we provide a proper UI implementation.
     return false;
 }
 
 juce::AudioProcessorEditor* Eucl_TitoAudioProcessor::createEditor()
 {
+    // Placeholder – once ready, instantiate Eucl_TitoAudioProcessorEditor so the
+    // user can tweak the sequencer visually.
     return nullptr;
 }
 
 //==============================================================================
 void Eucl_TitoAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    juce::ignoreUnused (destData);
+    // Future home for preset serialization (akin to saving a Max patch): stash
+    // parameter/value tree state so the DAW restores the pattern on session load.
 }
 
 void Eucl_TitoAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    juce::ignoreUnused (data, sizeInBytes);
+    // Mirror of getStateInformation(); apply the saved state back to parameters
+    // so the sequencer picks up exactly where the user left off.
 }
 
 //==============================================================================
