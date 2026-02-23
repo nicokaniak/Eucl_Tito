@@ -68,8 +68,7 @@ public:
 
 private:
     // Secuencia binaria euclidiana que alimenta al generador de notas en processBlock().
-    std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 1, 0, 1, 0, 1, 0,
-                                                   1, 0, 1, 0, 1, 0, 1, 0 };
+    std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     // Control del transporte local para que el secuenciador siga corriendo si el host
     // no entrega datos de timeline (o para suavizar saltos bruscos).
     double localClockPpq { 0.0 };                   // Paso 4: reloj de respaldo

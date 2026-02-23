@@ -103,7 +103,7 @@ void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& 
 }
 
 //==============================================================================
-void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) // .........................................PREPARE TO PLAY
 {
     juce::ignoreUnused (sampleRate, samplesPerBlock);
     // Hook que se ejecuta justo antes de que comience el audio. En términos de Max,
@@ -111,7 +111,7 @@ void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // acumuladores de fase o asignaremos buffers según la información temporal del host.
 }
 
-void Eucl_TitoAudioProcessor::releaseResources()
+void Eucl_TitoAudioProcessor::releaseResources() // .............................................................................RELEASE RESOURCES
 {
     // Contraparte simétrica de prepareToPlay(); libera buffers o recursos sueltos
     // para mantener liviano al procesador cuando el host está inactivo.
@@ -143,7 +143,7 @@ bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 }
 #endif
 
-void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) // ................PROCESS BLOCK
 {
     juce::ScopedNoDenormals noDenormals;
     // Este plugin solo emite MIDI gates, así que mantenemos el buffer de audio en silencio
@@ -182,6 +182,8 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         }
 
         lastHostPpq = posInfo.ppqPosition;
+    } else {
+        return;
     }
 
     const double blockEndPPQ = blockStartPPQ + (buffer.getNumSamples() * ppqPerSample);
