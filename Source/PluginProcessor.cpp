@@ -30,8 +30,29 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 {
-    // El constructor se mantiene liviano a propósito; el trabajo pesado ocurre en
-    // prepareToPlay() una vez que el host entrega sample rate y tamaño de buffer.
+    addParameter (N_steps = new juce::AudioParameterInt ("N_steps", // parameterID
+                      "N_steps", // parameter name
+                      0, // minimum value
+                      32, // maximum value
+                      16)); // default value
+    
+    addParameter (N_hits = new juce::AudioParameterInt ("N_hits", // parameterID
+                      "N_hits", // parameter name
+                      0, // minimum value
+                      32, // maximum value
+                      4)); // default value
+    
+    addParameter (rotation = new juce::AudioParameterInt ("rotation", // parameterID
+                      "rotation", // parameter name
+                      0, // minimum value
+                      31, // maximum value
+                      0)); // default value
+    
+    addParameter (note = new juce::AudioParameterInt ("note", // parameterID
+                      "note", // parameter name
+                      0, // minimum value
+                      127, // maximum value
+                      60)); // default value
 }
 
 Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
@@ -102,6 +123,18 @@ void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& 
 {
 }
 
+std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters()
+{
+    return generateEucluFromParameters(*N_steps, *N_hits, *rotation);
+}
+
+std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters(int numSteps, int numHits, int rotation)
+{
+    std::vector<int> newPattern(numSteps, 0);
+    // Implementación básica de generación de patrón euclidiano
+    // Esto es un placeholder que debería ser reemplazado por la lógica real
+    return newPattern;
+}
 //==============================================================================
 void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) // .........................................PREPARE TO PLAY
 {
@@ -203,8 +236,10 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     for (int loopIndex = firstLoop; loopIndex <= lastLoop; ++loopIndex)
     {
         const double loopOffset = loopIndex * sequenceLengthPPQ;
+        binaryPattern = generateEcluFromParameters();
         for (int step = 0; step < kNumSteps; ++step)
         {
+
             if (binaryPattern[(size_t) step] == 0)
                 continue;
 

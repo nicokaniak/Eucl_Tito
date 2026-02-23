@@ -67,6 +67,10 @@ public:
     static constexpr int kNumSteps = 16;
 
 private:
+    juce::AudioParameterInt* N_steps;
+    juce::AudioParameterInt* N_hits;
+    juce::AudioParameterInt* rotation;
+    juce::AudioParameterInt* note;
     // Secuencia binaria euclidiana que alimenta al generador de notas en processBlock().
     std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     // Control del transporte local para que el secuenciador siga corriendo si el host
