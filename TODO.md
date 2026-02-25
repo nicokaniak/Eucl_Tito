@@ -12,7 +12,7 @@
          hits: int, [0-Steps]
          rot: int, [0-Steps-1]
          nota: int, [0-127]
-[] agregar Algo euclidiano 
+[x] agregar Algo euclidiano 
 [] grabar parámetros y levantarlos al reiniciar         
 [] validación de parámetros
 
