@@ -18,6 +18,7 @@ namespace
     // por ahora se comportan como los objetos "Step" y "Gate" en un patch de Max.
     constexpr double kStepLengthPPQ = 0.25; // negra subdividida en corcheas
     constexpr double kGateLengthPPQ = 0.10; // valores menores acortan la nota
+    constexpr int kMaxStepParameter = 32;
 }
 
 //==============================================================================
@@ -33,19 +34,19 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
     addParameter (N_steps = new juce::AudioParameterInt ("N_steps", // parameterID
                       "N_steps", // parameter name
                       0, // minimum value
-                      32, // maximum value
+                      kMaxStepParameter, // maximum value
                       16)); // default value
     
     addParameter (N_hits = new juce::AudioParameterInt ("N_hits", // parameterID
                       "N_hits", // parameter name
                       0, // minimum value
-                      32, // maximum value
+                      kMaxStepParameter, // maximum value
                       4)); // default value
     
     addParameter (rotation = new juce::AudioParameterInt ("rotation", // parameterID
                       "rotation", // parameter name
                       0, // minimum value
-                      31, // maximum value
+                      kMaxStepParameter - 1, // maximum value
                       0)); // default value
     
     addParameter (note = new juce::AudioParameterInt ("note", // parameterID
@@ -125,15 +126,79 @@ void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& 
 
 std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters()
 {
-    return generateEucluFromParameters(*N_steps, *N_hits, *rotation);
+    const int numSteps       = N_steps != nullptr ? N_steps->get() : kNumSteps;
+    const int numHits        = N_hits  != nullptr ? N_hits->get()  : 0;
+    const int rotationSteps  = rotation != nullptr ? rotation->get() : 0;
+
+    return generateEucluFromParameters (numSteps, numHits, rotationSteps);
 }
 
-std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters(int numSteps, int numHits, int rotation)
+std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters (int numSteps,
+                                                                      int numHits,
+                                                                      int rotationSteps)
 {
-    std::vector<int> newPattern(numSteps, 0);
-    // Implementación básica de generación de patrón euclidiano
-    // Esto es un placeholder que debería ser reemplazado por la lógica real
-    return newPattern;
+    numSteps = juce::jlimit (1, kNumSteps, numSteps);
+    numHits  = juce::jlimit (0, numSteps, numHits);
+    const int rotationIndex = (numSteps > 0) ? (rotationSteps % numSteps + numSteps) % numSteps : 0;
+
+    if (numHits == 0)
+        return std::vector<int> (numSteps, 0);
+
+    if (numHits == numSteps)
+        return std::vector<int> (numSteps, 1);
+
+    std::vector<int> pattern;
+    pattern.reserve (numSteps);
+
+    std::vector<int> counts;
+    std::vector<int> remainders;
+    counts.reserve (numSteps);
+    remainders.reserve (numSteps);
+
+    int divisor = numSteps - numHits;
+    remainders.push_back (numHits);
+    int level = 0;
+
+    while (true)
+    {
+        counts.push_back (divisor / remainders[level]);
+        const int remainder = divisor % remainders[level];
+        remainders.push_back (remainder);
+        divisor = remainders[level];
+        level++;
+
+        if (remainders[level] <= 1)
+        {
+            counts.push_back (divisor);
+            break;
+        }
+    }
+
+    std::function<void (int)> build = [&](int lvl)
+    {
+        if (lvl == -1)
+        {
+            pattern.push_back (0);
+        }
+        else if (lvl == -2)
+        {
+            pattern.push_back (1);
+        }
+        else
+        {
+            for (int i = 0; i < counts[lvl]; ++i)
+                build (lvl - 1);
+            if (remainders[lvl] != 0)
+                build (lvl - 2);
+        }
+    };
+
+    build (level);
+
+    // rotate
+    std::rotate (pattern.begin(), pattern.begin() + rotationIndex, pattern.end());
+
+    return pattern;
 }
 //==============================================================================
 void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock) // .........................................PREPARE TO PLAY
@@ -233,10 +298,15 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // Conceptualmente, cada iteración es como un [uzi] de Max disparando notas hacia un
     // [makenote]: recorremos el patrón, creamos pares note-on/off y los escribimos en el
     // MidiBuffer para que el host escuche el groove en la muestra correcta.
+    const auto pattern = generateEucluFromParameters();
+    std::fill (binaryPattern.begin(), binaryPattern.end(), (uint8_t) 0);
+    const auto copyCount = std::min ((int) pattern.size(), kNumSteps);
+    for (int i = 0; i < copyCount; ++i)
+        binaryPattern[(size_t) i] = (uint8_t) (pattern[(size_t) i] != 0);
+
     for (int loopIndex = firstLoop; loopIndex <= lastLoop; ++loopIndex)
     {
         const double loopOffset = loopIndex * sequenceLengthPPQ;
-        binaryPattern = generateEcluFromParameters();
         for (int step = 0; step < kNumSteps; ++step)
         {
 

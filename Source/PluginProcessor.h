@@ -65,6 +65,8 @@ public:
 
     // Paso 1: definición del patrón solamente, codificada de forma fija.
     static constexpr int kNumSteps = 16;
+    std::vector<int> generateEucluFromParameters();
+    std::vector<int> generateEucluFromParameters (int numSteps, int numHits, int rotationSteps);
 
 private:
     juce::AudioParameterInt* N_steps;
