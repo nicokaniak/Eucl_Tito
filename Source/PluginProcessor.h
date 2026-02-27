@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <atomic>
 
 //==============================================================================
 /**
@@ -18,7 +19,9 @@
       * processBlock emite eventos MIDI que la interfaz (PluginEditor) podrá
         visualizar o controlar una vez que se añadan parámetros.
 */
-class Eucl_TitoAudioProcessor  : public juce::AudioProcessor
+class Eucl_TitoAudioProcessor  : public juce::AudioProcessor,
+                                 private juce::AsyncUpdater,
+                                 private juce::AudioProcessorParameter::Listener
 {
 public:
     //==============================================================================
@@ -51,6 +54,8 @@ public:
     bool producesMidi() const override;
     bool isMidiEffect() const override;
     double getTailLengthSeconds() const override;
+    void parameterValueChanged (int parameterIndex, float newValue) override;
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
     //==============================================================================
     int getNumPrograms() override;
@@ -70,6 +75,10 @@ public:
     std::vector<int> generateEucluFromParameters (int numSteps, int numHits, int rotationSteps);
 
 private:
+    void handleAsyncUpdate() override;
+    void scheduleHitClamp();
+    void ensureHitCountWithinStepBounds();
+
     juce::AudioParameterInt* N_steps;
     juce::AudioParameterInt* N_hits;
     juce::AudioParameterInt* rotation;
@@ -82,6 +91,7 @@ private:
     double localClockPpq { 0.0 };                   // Paso 4: reloj de respaldo
     double lastHostPpq { 0.0 };
     bool hostPositionInitialised { false };
+    std::atomic<bool> hitCountClampPending { false };
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Eucl_TitoAudioProcessor)
 };

@@ -42,26 +42,35 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                       0, // minimum value
                       kMaxStepParameter, // maximum value
                       4)); // default value
-    
+
     addParameter (rotation = new juce::AudioParameterInt ("rotation", // parameterID
                       "rotation", // parameter name
                       0, // minimum value
                       kMaxStepParameter - 1, // maximum value
                       0)); // default value
-    
+
     addParameter (note = new juce::AudioParameterInt ("note", // parameterID
                       "note", // parameter name
                       0, // minimum value
                       127, // maximum value
                       60)); // default value
 
+    if (N_steps != nullptr)
+        N_steps->addListener (this);
+
+    if (N_hits != nullptr)
+        N_hits->addListener (this);
+
     activeNotes.fill (kInvalidNote);
 }
 
 Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
 {
-    // Aún no hay nada que liberar; marcador para futuras asignaciones (buffers,
-    // attachments de parámetros) que seguirán el ciclo prepareToPlay()/releaseResources().
+    if (N_steps != nullptr)
+        N_steps->removeListener (this);
+
+    if (N_hits != nullptr)
+        N_hits->removeListener (this);
 }
 
 //==============================================================================
@@ -102,6 +111,24 @@ double Eucl_TitoAudioProcessor::getTailLengthSeconds() const
     return 0.0;
 }
 
+void Eucl_TitoAudioProcessor::parameterValueChanged (int parameterIndex, float newValue)
+{
+    juce::ignoreUnused (newValue);
+
+    const auto& params = getParameters();
+    if (! juce::isPositiveAndBelow (parameterIndex, params.size()))
+        return;
+
+    if (params[(size_t) parameterIndex] == N_steps
+        || params[(size_t) parameterIndex] == N_hits)
+        scheduleHitClamp();
+}
+
+void Eucl_TitoAudioProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
+{
+    juce::ignoreUnused (parameterIndex, gestureIsStarting);
+}
+
 int Eucl_TitoAudioProcessor::getNumPrograms()
 {
     return 1;   // Nota: algunos hosts no manejan bien que existan 0 programas,
@@ -124,6 +151,33 @@ const juce::String Eucl_TitoAudioProcessor::getProgramName (int index)
 
 void Eucl_TitoAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
+}
+
+void Eucl_TitoAudioProcessor::handleAsyncUpdate()
+{
+    hitCountClampPending.store (false);
+    ensureHitCountWithinStepBounds();
+}
+
+void Eucl_TitoAudioProcessor::scheduleHitClamp()
+{
+    if (! hitCountClampPending.exchange (true))
+        triggerAsyncUpdate();
+}
+
+void Eucl_TitoAudioProcessor::ensureHitCountWithinStepBounds()
+{
+    if (N_steps == nullptr || N_hits == nullptr)
+        return;
+
+    const int maxHits = juce::jmax (0, N_steps->get());
+    const int clampedHits = juce::jlimit (0, maxHits, N_hits->get());
+
+    if (clampedHits == N_hits->get())
+        return;
+
+    const auto normalised = N_hits->getNormalisableRange().convertTo0to1 ((float) clampedHits);
+    N_hits->setValueNotifyingHost (normalised);
 }
 
 std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters()
@@ -261,28 +315,37 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // avanzar con nuestro reloj interno. Este es el "cerebro" de transporte: escucha el playhead
     // del DAW (similar a conducir un patch con Ableton Link) y, si no hay datos, recurre a un contador
     // interno para que el secuenciador continúe.
-    juce::AudioPlayHead::CurrentPositionInfo posInfo;
     auto* playHeadPtr = getPlayHead();
-    const bool hasPosition = (playHeadPtr != nullptr && playHeadPtr->getCurrentPosition (posInfo));
-
-    const double bpm = (hasPosition && posInfo.bpm > 0.0) ? posInfo.bpm : 120.0;
+    const auto positionInfo = playHeadPtr != nullptr ? playHeadPtr->getPosition()
+                                                     : juce::Optional<juce::AudioPlayHead::PositionInfo> {};
+    const bool hasPosition = positionInfo.hasValue();
+    const double bpm = (hasPosition && positionInfo->getBpm().hasValue())
+                           ? juce::jmax (0.0, *positionInfo->getBpm())
+                           : 120.0;
     const double samplesPerBeat = sampleRate * 60.0 / bpm;
     const double ppqPerSample = samplesPerBeat > 0.0 ? 1.0 / samplesPerBeat : 0.0;
     if (ppqPerSample <= 0.0)
         return;
 
     double blockStartPPQ = localClockPpq;
-    if (hasPosition && posInfo.isPlaying)
+    const bool hostIsPlaying = hasPosition && positionInfo->getIsPlaying();
+    const bool hasHostPpq = hasPosition && positionInfo->getPpqPosition().hasValue();
+
+    if (hostIsPlaying && hasHostPpq)
     {
-        if (! hostPositionInitialised || std::abs (posInfo.ppqPosition - lastHostPpq) > 0.001)
+        const double hostPpq = *positionInfo->getPpqPosition();
+
+        if (! hostPositionInitialised || std::abs (hostPpq - lastHostPpq) > 0.001)
         {
-            blockStartPPQ = posInfo.ppqPosition;
+            blockStartPPQ = hostPpq;
             localClockPpq = blockStartPPQ;
             hostPositionInitialised = true;
         }
 
-        lastHostPpq = posInfo.ppqPosition;
-    } else {
+        lastHostPpq = hostPpq;
+    }
+    else
+    {
         return;
     }
 
