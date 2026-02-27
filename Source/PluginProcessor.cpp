@@ -54,6 +54,8 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                       0, // minimum value
                       127, // maximum value
                       60)); // default value
+
+    activeNotes.fill (kInvalidNote);
 }
 
 Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
@@ -319,15 +321,20 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             if (noteOnPPQ >= blockStartPPQ && noteOnPPQ < blockEndPPQ)
             {
                 const int sampleOffset = (int) std::round ((noteOnPPQ - blockStartPPQ) / ppqPerSample);
-                midiMessages.addEvent (juce::MidiMessage::noteOn (1, 60, (juce::uint8) 100),
+                const int noteValue = note->get();
+                activeNotes[(size_t) step] = noteValue; // atrapar nota anterior apra q no quede colgad
+                midiMessages.addEvent (juce::MidiMessage::noteOn (1, noteValue, (juce::uint8) 100),
                                        juce::jlimit (0, buffer.getNumSamples() - 1, sampleOffset));
             }
 
             if (noteOffPPQ >= blockStartPPQ && noteOffPPQ < blockEndPPQ)
             {
                 const int sampleOffset = (int) std::round ((noteOffPPQ - blockStartPPQ) / ppqPerSample);
-                midiMessages.addEvent (juce::MidiMessage::noteOff (1, 60),
+                const int storedNote = activeNotes[(size_t) step]; // atrapar nota anterior apra q no quede colgad
+                const int noteValue = storedNote != kInvalidNote ? storedNote : note->get();
+                midiMessages.addEvent (juce::MidiMessage::noteOff (1, noteValue, (juce::uint8) 100),
                                        juce::jlimit (0, buffer.getNumSamples() - 1, sampleOffset));
+                activeNotes[(size_t) step] = kInvalidNote;
             }
         }
     }

@@ -65,6 +65,7 @@ public:
 
     // Paso 1: definición del patrón solamente, codificada de forma fija.
     static constexpr int kNumSteps = 16;
+    static constexpr int kInvalidNote = -1; // atrapar nota anterior apra q no quede colgada
     std::vector<int> generateEucluFromParameters();
     std::vector<int> generateEucluFromParameters (int numSteps, int numHits, int rotationSteps);
 
@@ -75,6 +76,7 @@ private:
     juce::AudioParameterInt* note;
     // Secuencia binaria euclidiana que alimenta al generador de notas en processBlock().
     std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    std::array<int, kNumSteps> activeNotes {}; // atrapar nota anterior apra q no quede colgad
     // Control del transporte local para que el secuenciador siga corriendo si el host
     // no entrega datos de timeline (o para suavizar saltos bruscos).
     double localClockPpq { 0.0 };                   // Paso 4: reloj de respaldo
