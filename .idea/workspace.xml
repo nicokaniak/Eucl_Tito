@@ -32,11 +32,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Eucl_Tito.xml" beforeDir="false" />
+    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="Intellij idea configuration">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eucl_Tito.jucer" beforeDir="false" afterPath="$PROJECT_DIR$/Eucl_Tito.jucer" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Builds/LinuxMakefile/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Builds/LinuxMakefile/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,10 +110,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773267994196" />
-    <option name="spentUsd" value="0.023414" />
+    <option name="spentUsd" value="0.101568505" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="6" />
+    <option name="suspendCountdown" value="4" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -166,8 +165,25 @@
       <workItem from="1770675907600" duration="4827000" />
       <workItem from="1772378465713" duration="1117000" />
       <workItem from="1772379891537" duration="1429000" />
-      <workItem from="1772394561327" duration="2834000" />
+      <workItem from="1772394561327" duration="5114000" />
     </task>
+    <task id="LOCAL-00001" summary="Now a cmake file for linux is created and the JUCE modules are copied to the project">
+      <option name="closed" value="true" />
+      <created>1772398403967</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772398403968</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Intellij idea configuration">
+      <option name="closed" value="true" />
+      <created>1772398432539</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1772398432539</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -191,6 +207,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="Now a cmake file for linux is created and the JUCE modules are copied to the project" />
+    <MESSAGE value="Intellij idea configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Intellij idea configuration" />
     <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
   </component>
 </project>
