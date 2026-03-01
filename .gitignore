@@ -14,6 +14,19 @@ DerivedData/
 ipch/
 
 # Compiled objects and libraries
+Builds/LinuxMakefile/CMakeCache.txt
+Builds/LinuxMakefile/CMakeFiles/
+Builds/LinuxMakefile/Eucl_Tito_VST3ManifestHelper_artefacts/
+Builds/LinuxMakefile/Eucl_Tito_artefacts/
+Builds/LinuxMakefile/_deps/
+Builds/LinuxMakefile/cmake_install.cmake
+CMakeCache.txt
+CMakeFiles/
+Eucl_Tito_VST3ManifestHelper_artefacts/
+Eucl_Tito_artefacts/
+Makefile
+_deps/
+cmake_install.cmake
 *.obj
 *.o
 *.lo

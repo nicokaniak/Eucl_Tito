@@ -32,11 +32,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="Intellij idea configuration">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Builds/LinuxMakefile/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Builds/LinuxMakefile/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="New makefile">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,10 +107,10 @@
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773267994196" />
-    <option name="spentUsd" value="0.101568505" />
+    <option name="spentUsd" value="0.12560551" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="4" />
+    <option name="suspendCountdown" value="3" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -165,7 +162,7 @@
       <workItem from="1770675907600" duration="4827000" />
       <workItem from="1772378465713" duration="1117000" />
       <workItem from="1772379891537" duration="1429000" />
-      <workItem from="1772394561327" duration="5114000" />
+      <workItem from="1772394561327" duration="5683000" />
     </task>
     <task id="LOCAL-00001" summary="Now a cmake file for linux is created and the JUCE modules are copied to the project">
       <option name="closed" value="true" />
@@ -183,7 +180,31 @@
       <option name="project" value="LOCAL" />
       <updated>1772398432539</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Draft of instructions">
+      <option name="closed" value="true" />
+      <created>1772401273097</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1772401273097</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Intellij IDEA Config">
+      <option name="closed" value="true" />
+      <created>1772401300897</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772401300897</updated>
+    </task>
+    <task id="LOCAL-00005" summary="New makefile">
+      <option name="closed" value="true" />
+      <created>1772401321708</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1772401321708</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -209,7 +230,10 @@
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="Now a cmake file for linux is created and the JUCE modules are copied to the project" />
     <MESSAGE value="Intellij idea configuration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Intellij idea configuration" />
+    <MESSAGE value="Draft of instructions" />
+    <MESSAGE value="Intellij IDEA Config" />
+    <MESSAGE value="New makefile" />
+    <option name="LAST_COMMIT_MESSAGE" value="New makefile" />
     <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
   </component>
 </project>
