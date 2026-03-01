@@ -17,21 +17,28 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="Eucl_Tito" targetName="Eucl_Tito" folderName="Eucl_Tito" />
-      <config projectName="Eucl_Tito" targetName="Eucl_Tito_VST3" folderName="Eucl_Tito" />
-      <config projectName="Eucl_Tito" targetName="Eucl_Tito_Standalone" folderName="Eucl_Tito" />
-      <config projectName="Eucl_Tito" targetName="Eucl_Tito_VST3ManifestHelper" />
-      <config projectName="Eucl_Tito" targetName="Eucl_Tito_All" folderName="Eucl_Tito" />
-      <config projectName="Eucl_Tito" targetName="juce_vst3_helper" />
+      <config projectName="Project" targetName="Eucl_Tito_Standalone" folderName="Eucl_Tito" />
+      <config projectName="Project" targetName="Eucl_Tito" folderName="Eucl_Tito" />
+      <config projectName="Project" targetName="Eucl_Tito_VST3" folderName="Eucl_Tito" />
+      <config projectName="Project" targetName="Eucl_Tito_VST3ManifestHelper" />
+      <config projectName="Project" targetName="Eucl_Tito_All" folderName="Eucl_Tito" />
+      <config projectName="Project" targetName="juce_vst3_helper" />
     </generated>
   </component>
-  <component name="CMakeSettings">
+  <component name="CMakeSettings" AUTO_RELOAD="true">
     <configurations>
       <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Release" ENABLED="true" CONFIG_NAME="Release" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="" />
+    <list default="true" id="99c08a1e-afea-4210-a75e-624500dca0eb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Eucl_Tito.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Eucl_Tito.jucer" beforeDir="false" afterPath="$PROJECT_DIR$/Eucl_Tito.jucer" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,7 +48,8 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="2058" />
+    <option name="cachedIndexableFilesCount" value="28" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
@@ -74,6 +82,7 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "CMake Debug.Eucl_Tito.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -88,25 +97,26 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "master",
     "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/arobirosa/no_backup/kaniakNicolas/euclTito",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "org.rust.first.attach.projects": "true",
-    "settings.editor.selected.configurable": "reference.settings.grazie.pro.style",
+    "settings.editor.selected.configurable": "CMakeSettings",
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecapSpentCounter">
     <option name="endsOfQuotaMs" value="1773267994196" />
-    <option name="spentUsd" value="0.0034" />
+    <option name="spentUsd" value="0.023414" />
   </component>
   <component name="RecapUselessUpdatesCounter">
-    <option name="suspendCountdown" value="9" />
+    <option name="suspendCountdown" value="6" />
   </component>
-  <component name="RunManager" selected="CMake Debug.Eucl_Tito">
+  <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -135,50 +145,11 @@
     <configuration name="&lt;template&gt;" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" default="true" selected="false">
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
     </configuration>
-    <configuration name="Eucl_Tito" type="CMakeRunConfiguration" factoryName="Application" folderName="Eucl_Tito" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="Eucl_Tito" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Eucl_Tito_All" type="CMakeRunConfiguration" factoryName="Application" folderName="Eucl_Tito" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="Eucl_Tito_All" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Eucl_Tito_Standalone" type="CMakeRunConfiguration" factoryName="Application" folderName="Eucl_Tito" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="Eucl_Tito_Standalone" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Eucl_Tito" RUN_TARGET_NAME="Eucl_Tito_Standalone">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Eucl_Tito_VST3" type="CMakeRunConfiguration" factoryName="Application" folderName="Eucl_Tito" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="Eucl_Tito_VST3" CONFIG_NAME="Debug">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Eucl_Tito_VST3ManifestHelper" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="Eucl_Tito_VST3ManifestHelper" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Eucl_Tito" RUN_TARGET_NAME="Eucl_Tito_VST3ManifestHelper">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="juce_vst3_helper" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Eucl_Tito" TARGET_NAME="juce_vst3_helper" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Eucl_Tito" RUN_TARGET_NAME="juce_vst3_helper">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="CMake Application.Eucl_Tito" />
-      <item itemvalue="CMake Application.Eucl_Tito_All" />
-      <item itemvalue="CMake Application.Eucl_Tito_Standalone" />
-      <item itemvalue="CMake Application.Eucl_Tito_VST3" />
-      <item itemvalue="CMake Application.Eucl_Tito_VST3ManifestHelper" />
-      <item itemvalue="CMake Application.juce_vst3_helper" />
-      <item itemvalue="CMake Debug.Eucl_Tito" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="CMake Debug.Eucl_Tito" />
@@ -194,6 +165,8 @@
       <updated>1770675903451</updated>
       <workItem from="1770675907600" duration="4827000" />
       <workItem from="1772378465713" duration="1117000" />
+      <workItem from="1772379891537" duration="1429000" />
+      <workItem from="1772394561327" duration="2834000" />
     </task>
     <servers />
   </component>
