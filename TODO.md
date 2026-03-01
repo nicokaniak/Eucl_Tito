@@ -14,7 +14,7 @@
          nota: int, [0-127]
 [x] agregar Algo euclidiano 
 [] grabar parámetros y levantarlos al reiniciar         
-[] validación de parámetros
+[x] validación de parámetros
 
 
 ## Spring 3

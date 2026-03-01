@@ -16,8 +16,15 @@ namespace
     // Configuración del grid del secuenciador expresada en pulsos por negra (PPQ).
     // El procesador y el editor podrán exponer estos valores como parámetros más adelante;
     // por ahora se comportan como los objetos "Step" y "Gate" en un patch de Max.
+
+    // Longitud de cada paso medido en PPQ (pulsos por negra). Imagina un metro en Max que avanza
+    // cada corchea: aquí 0.25 equivale a 1/4 de negra (semicorchea).
     constexpr double kStepLengthPPQ = 0.25; // negra subdividida en corcheas
+
+    // Duración de las puertas MIDI; reducir este valor crea notas más cortas.
     constexpr double kGateLengthPPQ = 0.10; // valores menores acortan la nota
+
+    // Límite superior para parámetros expuestos al host (p. ej., cantidad máxima de pasos).
     constexpr int kMaxStepParameter = 32;
 }
 
@@ -31,6 +38,8 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
 #endif
 {
+    // Los parámetros serán visibles para el host/automatización. Son equivalentes a los números
+    // que ajustarías en un objeto [number] o [dial] dentro de Max.
     addParameter (N_steps = new juce::AudioParameterInt ("N_steps", // parameterID
                       "N_steps", // parameter name
                       0, // minimum value
@@ -55,6 +64,7 @@ Eucl_TitoAudioProcessor::Eucl_TitoAudioProcessor()
                       127, // maximum value
                       60)); // default value
 
+    // Nos registramos como listeners para enterarnos cuando el usuario cambie los sliders.
     if (N_steps != nullptr)
         N_steps->addListener (this);
 
@@ -115,6 +125,8 @@ void Eucl_TitoAudioProcessor::parameterValueChanged (int parameterIndex, float n
 {
     juce::ignoreUnused (newValue);
 
+    // Cada vez que cambian N_steps o N_hits disparamos un chequeo asincrónico para evitar estados
+    // imposibles (más golpes que pasos disponibles).
     const auto& params = getParameters();
     if (! juce::isPositiveAndBelow (parameterIndex, params.size()))
         return;
@@ -170,6 +182,8 @@ void Eucl_TitoAudioProcessor::ensureHitCountWithinStepBounds()
     if (N_steps == nullptr || N_hits == nullptr)
         return;
 
+    // Reduce "N_hits" si supera el número de pasos; pensar en esto como un gate que evita
+    // inconsistencias dentro del secuenciador.
     const int maxHits = juce::jmax (0, N_steps->get());
     const int clampedHits = juce::jlimit (0, maxHits, N_hits->get());
 
@@ -352,6 +366,7 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     const double blockEndPPQ = blockStartPPQ + (buffer.getNumSamples() * ppqPerSample);
     localClockPpq = blockEndPPQ;
 
+    // Longitud total del loop en PPQ: kNumSteps * duración de cada paso.
     const double sequenceLengthPPQ = kNumSteps * kStepLengthPPQ;
     if (sequenceLengthPPQ <= 0.0)
         return;
@@ -363,6 +378,7 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // Conceptualmente, cada iteración es como un [uzi] de Max disparando notas hacia un
     // [makenote]: recorremos el patrón, creamos pares note-on/off y los escribimos en el
     // MidiBuffer para que el host escuche el groove en la muestra correcta.
+    // Generamos el patrón binario euclidiano en caliente para reflejar tweaks inmediatos del usuario.
     const auto pattern = generateEucluFromParameters();
     std::fill (binaryPattern.begin(), binaryPattern.end(), (uint8_t) 0);
     const auto copyCount = std::min ((int) pattern.size(), kNumSteps);

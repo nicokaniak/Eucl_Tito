@@ -75,8 +75,14 @@ public:
     std::vector<int> generateEucluFromParameters (int numSteps, int numHits, int rotationSteps);
 
 private:
+    // AsyncUpdater actúa como un buzón: en vez de bloquear el hilo de audio filtramos
+    // los cambios de parámetros y los aplicamos luego en el hilo de mensajes.
     void handleAsyncUpdate() override;
+
+    // Agenda una validación diferida para evitar que N_hits supere la cantidad de pasos.
     void scheduleHitClamp();
+
+    // Comprueba los parámetros provenientes del host/UI y fuerza que queden en rangos válidos.
     void ensureHitCountWithinStepBounds();
 
     juce::AudioParameterInt* N_steps;
@@ -85,12 +91,17 @@ private:
     juce::AudioParameterInt* note;
     // Secuencia binaria euclidiana que alimenta al generador de notas en processBlock().
     std::array<uint8_t, kNumSteps> binaryPattern { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    // Almacenamos la última nota enviada en cada paso para poder generar noteOff consistentes.
     std::array<int, kNumSteps> activeNotes {}; // atrapar nota anterior apra q no quede colgad
+
     // Control del transporte local para que el secuenciador siga corriendo si el host
     // no entrega datos de timeline (o para suavizar saltos bruscos).
     double localClockPpq { 0.0 };                   // Paso 4: reloj de respaldo
     double lastHostPpq { 0.0 };
     bool hostPositionInitialised { false };
+
+    // Flag lock-free que evita disparar múltiples clamps simultáneos cuando el usuario mueve sliders.
     std::atomic<bool> hitCountClampPending { false };
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Eucl_TitoAudioProcessor)
