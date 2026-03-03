@@ -81,6 +81,10 @@ Eucl_TitoAudioProcessor::~Eucl_TitoAudioProcessor()
 
     if (N_hits != nullptr)
         N_hits->removeListener (this);
+   
+    if (rotation != nullptr)
+        rotation->removeListener (this);
+
 }
 
 //==============================================================================
@@ -130,10 +134,11 @@ void Eucl_TitoAudioProcessor::parameterValueChanged (int parameterIndex, float n
     const auto& params = getParameters();
     if (! juce::isPositiveAndBelow (parameterIndex, params.size()))
         return;
-
+ //
     if (params[(size_t) parameterIndex] == N_steps
-        || params[(size_t) parameterIndex] == N_hits)
-        scheduleHitClamp();
+        || params[(size_t) parameterIndex] == N_hits
+        || params[(size_t) parameterIndex] == rotation)
+        scheduleParameterValidation();
 }
 
 void Eucl_TitoAudioProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
@@ -171,7 +176,7 @@ void Eucl_TitoAudioProcessor::handleAsyncUpdate()
     ensureHitCountWithinStepBounds();
 }
 
-void Eucl_TitoAudioProcessor::scheduleHitClamp()
+void Eucl_TitoAudioProcessor::scheduleParameterValidation()
 {
     if (! hitCountClampPending.exchange (true))
         triggerAsyncUpdate();
@@ -179,7 +184,7 @@ void Eucl_TitoAudioProcessor::scheduleHitClamp()
 
 void Eucl_TitoAudioProcessor::ensureHitCountWithinStepBounds()
 {
-    if (N_steps == nullptr || N_hits == nullptr)
+    if (N_steps == nullptr || N_hits == nullptr) //TODO: contemplar cuando se reduce los valores
         return;
 
     // Reduce "N_hits" si supera el número de pasos; pensar en esto como un gate que evita
@@ -203,9 +208,7 @@ std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters()
     return generateEucluFromParameters (numSteps, numHits, rotationSteps);
 }
 
-std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters (int numSteps,
-                                                                      int numHits,
-                                                                      int rotationSteps)
+std::vector<int> Eucl_TitoAudioProcessor::generateEucluFromParameters (int numSteps, int numHits, int rotationSteps)
 {
     numSteps = juce::jlimit (1, kNumSteps, numSteps);
     numHits  = juce::jlimit (0, numSteps, numHits);
@@ -279,38 +282,6 @@ void Eucl_TitoAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     // acumuladores de fase o asignaremos buffers según la información temporal del host.
 }
 
-void Eucl_TitoAudioProcessor::releaseResources() // .............................................................................RELEASE RESOURCES
-{
-    // Contraparte simétrica de prepareToPlay(); libera buffers o recursos sueltos
-    // para mantener liviano al procesador cuando el host está inactivo.
-}
-
-#ifndef JucePlugin_PreferredChannelConfigurations
-bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
-{
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-  #else
-    // Acá es donde se valida si el diseño de buses es compatible.
-    // En esta plantilla solo se aceptan mono o estéreo.
-    // Algunos hosts (p. ej. ciertas versiones de GarageBand) únicamente cargan
-    // plugins que soporten buses estéreo.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
-        return false;
-
-    // Verifica que la configuración de entrada coincida con la de salida
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-   #endif
-
-    return true;
-  #endif
-}
-#endif
-
 void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages) // ................PROCESS BLOCK
 {
     juce::ScopedNoDenormals noDenormals;
@@ -319,7 +290,7 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // mientras se sigue usando la red de eventos en Max).
     buffer.clear();
 
-    midiMessages.clear();
+    midiMessages.clear(); // Limpia el buffer de MIDI
 
     const double sampleRate = getSampleRate();
     if (sampleRate <= 0.0)
@@ -442,6 +413,40 @@ void Eucl_TitoAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     }
    #endif
 }
+
+void Eucl_TitoAudioProcessor::releaseResources() // .............................................................................RELEASE RESOURCES
+{
+    // Contraparte simétrica de prepareToPlay(); libera buffers o recursos sueltos
+    // para mantener liviano al procesador cuando el host está inactivo.
+}
+
+#ifndef JucePlugin_PreferredChannelConfigurations
+bool Eucl_TitoAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+{
+  #if JucePlugin_IsMidiEffect
+    juce::ignoreUnused (layouts);
+    return true;
+  #else
+    // Acá es donde se valida si el diseño de buses es compatible.
+    // En esta plantilla solo se aceptan mono o estéreo.
+    // Algunos hosts (p. ej. ciertas versiones de GarageBand) únicamente cargan
+    // plugins que soporten buses estéreo.
+    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        return false;
+
+    // Verifica que la configuración de entrada coincida con la de salida
+   #if ! JucePlugin_IsSynth
+    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+        return false;
+   #endif
+
+    return true;
+  #endif
+}
+#endif
+
+
 
 //==============================================================================
 bool Eucl_TitoAudioProcessor::hasEditor() const

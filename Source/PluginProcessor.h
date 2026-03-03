@@ -80,7 +80,7 @@ private:
     void handleAsyncUpdate() override;
 
     // Agenda una validación diferida para evitar que N_hits supere la cantidad de pasos.
-    void scheduleHitClamp();
+    void scheduleParameterValidation();
 
     // Comprueba los parámetros provenientes del host/UI y fuerza que queden en rangos válidos.
     void ensureHitCountWithinStepBounds();
